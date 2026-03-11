@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - db_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - AnimeNetwork
+
+  frontend:
+    build: ./client
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - AnimeNetwork
+
+  backend:
+    build: .
+    container_name: Backend
+    ports:
+      - "5000:5000"
+    environment:
+      DB_URI: mongodb://root:example@db:27017/shopx?authSource=admin
+    depends_on:
+      - db
+    networks:
+      - AnimeNetwork
+
+volumes:
+  db_data:
+
+networks:
+  AnimeNetwork:
+    driver: bridge
+    
